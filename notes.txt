@@ -1,0 +1,97 @@
+
+
+
+Useful links
+============
+
+http://www.amazon.com/SockitBox-Large-Weatherproof-Connection-Box/dp/B006EUHSNC/ref=sr_1_1?ie=UTF8&qid=1420062458&sr=8-1&keywords=dribox
+
+https://learn.adafruit.com/reading-a-analog-in-and-controlling-audio-volume-with-the-raspberry-pi?view=all
+https://www.adafruit.com/products/914
+https://learn.sparkfun.com/tutorials/analog-to-digital-conversion/arduino-adc-example
+
+
+
+Parts list:
+===========
+
+* DEV-12994 -- Raspberry Pi - Model B+
+* DEV-12654 -- Raspberry Pi Camera Module - Pi NoIR
+* PRT-12846 -- Raspberry Pi Camera Case - Black Plastic
+* PRT-13102 -- Pi Tin for the Raspberry Pi - Black (B+)
+* DEV-12998 -- Raspberry Pi - 8GB SD Card
+* Other:
+** USB micro power cord
+** ethernet cable
+** extension cord
+** screws and corner brackets for mounting the case and camera
+** electrical tape for covering unused ports in case
+
+
+
+Network
+=======
+
+MAC address for ethernet
+192.168.2.7	UNKNOWN	B8:27:EB:95:A0:84
+http://192.168.2.1/lan_dhcp.html
+
+
+Setting up the Pi
+=================
+
+
+Installing linux
+
+1. Download Raspbian
+
+# go to http://www.raspberrypi.org/downloads/
+# and download 2014-12-24-wheezy-raspbian.zip (or the latest)
+unzip 2014-12-24-wheezy-raspbian.zip
+
+2. Format SD card with image
+
+# plug in card, then run
+df -h  # get mount
+# unmount
+umount /dev/mmcblk0p3
+# format
+# (from http://www.raspberrypi.org/documentation/installation/installing-images/linux.md)
+dd bs=4M if=2014-12-24-wheezy-raspbian.img of=/dev/mmcblk0
+
+3. Test installation
+
+plug the pi into the ethernet jack
+plug in the card to the pi and try booting up
+I had issues with the HDMI out so i ssh'd in instead: use the router admin to get the IP address (or set it to static in the config before plugging it in), then ssh in with pi@IP and password "raspberry"
+
+4. Configuration
+
+# ssh into machine and run
+sudo raspi-config
+
+# i ran:
+#   1. Expand Filesystem
+#   (didn't change the user/pass just yet)
+#   3. Enable boot to text console
+#   8.A2. Hostname -- changed to quailcam
+
+# then i plugged in the camera and ran
+sudo raspi-config
+#  5. Enable Camera
+raspistill -o test.jpg
+
+
+
+Setting up MJPG-STREAMER
+========================
+
+pretty much followed these exactly:
+http://blog.miguelgrinberg.com/post/how-to-build-and-run-mjpg-streamer-on-the-raspberry-pi
+http://jacobsalmela.com/raspberry-pi-webcam-using-mjpg-streamer-over-internet/
+
+raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0 &
+mjpg_streamer -i "input_file.so -f tmp/stream -n pic.jpg" -o "output_http.so -w /usr/local/www"
+
+see scripts/ for more
+
