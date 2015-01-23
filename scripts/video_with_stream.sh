@@ -12,7 +12,10 @@ echo ""
 
 ROOTDIR=/home/pi/videos
 
-LENGTHMS=600000  # ten minutes
+# write picture
+raspistill -w 2592 -h 1944 -q 100 -n -ex night -o ${ROOTDIR}/latest.jpg
+
+LENGTHMS=599000  # ten minutes
 FILEDIR=${ROOTDIR}/$(date +%H)
 FILENAME=${FILEDIR}/$(date +%Y%m%d_%H%M).h264
 
