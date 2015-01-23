@@ -1,0 +1,73 @@
+
+save images and then convert them to videos
+===========================================
+
+
+ROOTDIR=/home/pi
+
+images/
+ current/
+   the current stream of images
+ previous/
+   the previous stream of images (for processing)
+
+videos/
+ 00
+ 01
+ ...
+ 23
+
+
+# echo $(date +%H%M_%S_)$(($(date +%N)/1000000));
+
+
+every 10 ms
+  write image to images/current with the timestamp
+    raspistill --nopreview -w 960 -h 720 -q 30 -o - -tl 50 -t 999999999 -th 0:0:0 -ex backlight -mm backlit | tee $ROOTDIR/images/$(date +%H%M_%S_)$(($(date +%N)/1000000)).jpg
+  tee this image to ~/tmp/stream/pic.jpg
+
+mjpeg-streamer will use ~/tmp/stream/pic.jpg
+
+every 10 min
+  rm images/previous/*
+  mv images/current/* to images/previous/
+  take the sequence of images in images/previous and use ffmpeg to create a video
+  name this video with a timestamp
+  save the video in the corresponding folder
+
+every hour
+  wipe the video for the next hour (in preparation)
+
+
+
+save videos and extract images
+==============================
+
+(thanks to http://www.raspberrypi.org/forums/viewtopic.php?t=73061&p=526393)
+
+
+videos/
+ 00
+ 01
+ ...
+ 23
+
+
+#!/bin/bash
+
+ROOTDIR=/home/pi
+
+LENGTHMS=10000
+FILENAME=${ROOTDIR}/videos/$(date +%H)/$(date +%Y%m%d_%H%M).h264
+
+raspivid -o - -t ${LENGTHMS} -w 640 -h 480 -fps 25 | tee ${FILENAME} | cvlc stream:///dev/stdin --sout '#standard{access=http,mux=ts,dst=:8090}' :demux=h264 &
+CVLCPID=$!
+
+sleep $(($LENGTHMS/1000))
+kill ${CVLCPID}
+
+
+watch with
+  vlc http://quailcam:8090 --loop
+(make sure to switch this setting: https://www.youtube.com/watch?v=docAQ69ThwM)
+
