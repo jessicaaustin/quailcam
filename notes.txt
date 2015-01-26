@@ -1,20 +1,25 @@
 
 
+next steps:
+  test out all the sensors, understand how they work and what sort of data they put out (using arduino)
+     TMP36
+     HTU21D
+     photocells
+     waterproof temp sensor
+  test the sensors wired to the ADC (maybe with the arduino?)
+  hook up to pi and test 
+
+
 
 Useful links
 ============
-
-http://www.amazon.com/SockitBox-Large-Weatherproof-Connection-Box/dp/B006EUHSNC/ref=sr_1_1?ie=UTF8&qid=1420062458&sr=8-1&keywords=dribox
-
-https://learn.adafruit.com/reading-a-analog-in-and-controlling-audio-volume-with-the-raspberry-pi?view=all
-https://www.adafruit.com/products/914
-https://learn.sparkfun.com/tutorials/analog-to-digital-conversion/arduino-adc-example
 
 
 
 Parts list:
 ===========
 
+Pi and camera:
 * DEV-12994 -- Raspberry Pi - Model B+
 * DEV-12654 -- Raspberry Pi Camera Module - Pi NoIR
 * PRT-12846 -- Raspberry Pi Camera Case - Black Plastic
@@ -26,6 +31,14 @@ Parts list:
 ** extension cord
 ** screws and corner brackets for mounting the case and camera
 ** electrical tape for covering unused ports in case
+
+Sensors:
+* KIT-13091 -- SparkFun Pi Wedge B+
+* MCP308-I/P-ND -- IC ADC 10BIT 2.7V 8CH SPI 16DIP
+* SEN-10988 -- Temperature Sensor - TMP36 (x3)
+* SEN-09088 -- Mini Photocell (x3)
+* SEN-12064 -- SparkFun Humidity and Temperature Sensor Breakout - HTU21D
+* SEN-11050 -- Temperature Sensor - Waterproof (DS18B20)
 
 
 
@@ -94,4 +107,42 @@ raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999
 mjpg_streamer -i "input_file.so -f tmp/stream -n pic.jpg" -o "output_http.so -w /usr/local/www"
 
 see scripts/ for more
+
+
+
+Installing a 32GB SD card
+=========================
+
+Apparently, using any Micro SD card with 32gb capacity should be fine: 
+http://www.raspberrypi.org/forums/viewtopic.php?f=63&t=81736&p=633284&hilit=sdhc#p633284
+http://www.raspberrypi.org/forums/viewtopic.php?f=63&t=83999
+http://webcache.googleusercontent.com/search?q=cache:939XVUimQEsJ:elinux.org/RPi_SD_cards+&cd=1&hl=en&ct=clnk&gl=us
+
+bought SDSDX-032G-X46 for $28 on amazon
+
+http://superuser.com/questions/460657/cloning-an-sd-card-onto-a-larger-sd-card
+
+
+Setting up sensors
+==================
+
+
+https://learn.adafruit.com/reading-a-analog-in-and-controlling-audio-volume-with-the-raspberry-pi?view=all
+https://www.adafruit.com/products/914
+https://learn.sparkfun.com/tutorials/analog-to-digital-conversion/arduino-adc-example
+
+http://arduino.cc/en/Reference/analogRead
+http://www.ladyada.net/learn/sensors/temp36.html
+
+analogread 0-1023 corresponds to 0-5V
+Temp in °C = [(Vout in mV) - 500] / 10
+
+function analogReadTomV(int aRead) {
+    return aRead/1023*5000;
+}
+function tempInCelsius(int mV) {
+    return (mV - 500)/10;
+}
+
+
 
