@@ -17,5 +17,9 @@ convert ${LOCALFILE} -resize 25%  -fill '#eeeeee'  -undercolor '#00000080' -poin
 /home/pi/Dropbox-Uploader/dropbox_uploader.sh upload /tmp/latest.jpg /latest.jpg
 
 # small image (for timelapse)
-convert ${LOCALFILE} -resize 10% -fill '#000000'  -pointsize 12  -annotate +0+12 " $annotation " /home/pi/videos/dailytimelapse/$(date +%H%M).jpg
-# TODO: convert this to an animated gif throughout the day: convert -delay 20 -loop 0 *.jpg result.gif
+TIMELAPSEDIR=/home/pi/videos/dailytimelapse
+find ${TIMELAPSEDIR}/ -type f -mmin +480 -delete
+convert ${LOCALFILE} -resize 10% -quality 80 -fill '#000000'  -pointsize 12  -annotate +0+12 " $annotation " ${TIMELAPSEDIR}/$(date +%Y%m%d_%H%M).jpg
+echo "Creating timelapse..."
+convert -delay 30 -loop 0 ${TIMELAPSEDIR}/*.jpg ${TIMELAPSEDIR}/latest-timelapse.gif
+/home/pi/Dropbox-Uploader/dropbox_uploader.sh upload ${TIMELAPSEDIR}/latest-timelapse.gif /latest-timelapse.gif
